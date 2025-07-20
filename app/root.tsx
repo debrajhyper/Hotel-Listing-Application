@@ -1,5 +1,6 @@
 import {
   isRouteErrorResponse,
+  Link,
   Links,
   Meta,
   Outlet,
@@ -8,7 +9,12 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
-import "./app.css";
+import "./styles.css";
+import { ThemeProvider } from "./components/theme/theme-provider";
+import { ModeToggle } from "./components/theme/mode-toggle";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
+import { TooltipProvider } from "./components/ui/tooltip";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -25,24 +31,52 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body>
-        {children}
+      <body className="min-h-screen bg-background text-foreground">
+        <Provider store={store}>
+          <ThemeProvider
+          defaultTheme="dark"
+          storageKey="vite-ui-theme"
+        >
+          <TooltipProvider>
+          <div className="flex flex-col min-h-screen">
+            <header className="border-b">
+              <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
+                <Link to="/" className="font-semibold text-lg">Hotel Booking</Link>
+                <ModeToggle />
+              </nav>
+            </header>
+
+            <main className="flex-1">
+              {children}
+            </main>
+
+            <footer className="border-t mt-12">
+              <div className="container mx-auto px-4 py-6 text-center text-sm text-gray-600">
+                © 2025 Hotel Booking. All rights reserved.
+              </div>
+            </footer>
+          </div>
+          </TooltipProvider>
+        </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
+        </Provider>
       </body>
     </html>
   );
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <Outlet />
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
