@@ -48,7 +48,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex flex-col min-h-screen">
             <header className="border-b">
               <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
-                <Link to="/" className="font-semibold text-lg">Hotel Booking</Link>
+                <Link to="/" className="font-semibold text-lg flex gap-2 items-center">
+                  <img src="/hotel.png" alt="Logo" className="h-9 w-9" />
+                  Hotel Booking
+                </Link>
                 <ModeToggle />
               </nav>
             </header>

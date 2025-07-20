@@ -22,6 +22,7 @@ export function HotelList({ searchParams }: HotelListProps) {
   const dispatch = useAppDispatch();
   const { hotels, filteredHotels, isLoading: loading, error, filters } = useAppSelector(state => state.search);
   const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
+  const [descExpanded, setDescExpanded] = useState(false);
   const destination = useAppSelector(state => state.search.destination);
   const location = useLocation();
 
@@ -243,19 +244,20 @@ export function HotelList({ searchParams }: HotelListProps) {
       </div>
 
       <Dialog open={!!selectedHotel} onOpenChange={() => setSelectedHotel(null)}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="!max-w-4xl">
           {selectedHotel && (
             <ScrollArea className="max-h-[90vh]">
-              <div className="space-y-4">
+              <div className="space-y-6 p-2">
+                {/* Image Gallery */}
                 <div className="aspect-video relative overflow-hidden rounded-lg">
                   <Carousel className="w-full">
                     <CarouselContent>
-                      {(selectedHotel.hotelImageLinks || []).map((image, index) => (
+                      {(selectedHotel.hotelImageLinks?.length ? selectedHotel.hotelImageLinks : [{ imageLink: DEFAULT_IMAGE }]).map((image, index) => (
                         <CarouselItem key={index}>
                           <img
                             src={image.imageLink}
                             alt={`${selectedHotel.hotelName} - Image ${index + 1}`}
-                            className="object-cover w-full h-full aspect-video rounded-lg"
+                            className="object-cover w-full h-full aspect-video rounded-lg overflow-hidden"
                             onError={(e) => {
                               e.currentTarget.src = DEFAULT_IMAGE;
                             }}
@@ -263,7 +265,7 @@ export function HotelList({ searchParams }: HotelListProps) {
                         </CarouselItem>
                       ))}
                     </CarouselContent>
-                    {selectedHotel.hotelImageLinks.length > 1 && (
+                    {selectedHotel.hotelImageLinks?.length > 1 && (
                       <>
                         <CarouselPrevious className="left-2 cursor-pointer" />
                         <CarouselNext className="right-2 cursor-pointer" />
@@ -272,44 +274,27 @@ export function HotelList({ searchParams }: HotelListProps) {
                   </Carousel>
                 </div>
 
+                {/* Description */}
                 <div>
-                  <h2 className="text-2xl font-bold">{selectedHotel.hotelName}</h2>
-                  <p className="text-muted-foreground">{selectedHotel.address}</p>
+                  <h2 className="text-4xl font-bold mb-2">{selectedHotel.hotelName}</h2>
+                  <p className="text-muted-foreground mb-2">{selectedHotel.address}</p>
+                  {selectedHotel.description && (
+                    <div className="mb-2">
+                      <h3 className="font-semibold mb-1">Description</h3>
+                      <p className={`text-base text-gray-700 dark:text-gray-300 ${descExpanded ? '' : 'line-clamp-3'}`}>{selectedHotel.description}</p>
+                      {selectedHotel.description.length > 120 && (
+                        <button
+                          className="text-primary underline text-sm mt-1 cursor-pointer"
+                          onClick={() => setDescExpanded(v => !v)}
+                        >
+                          {descExpanded ? 'Show less' : 'Show more'}
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="font-semibold mb-2">Property Details</h3>
-                    <ul className="space-y-2">
-                      <li>Rating: {selectedHotel.rating}</li>
-                      <li>Accommodation Type: {selectedHotel.hotelAccommodation}</li>
-                      {selectedHotel.segments?.length > 0 && (
-                        <li>Segments: {selectedHotel.segments.join(', ')}</li>
-                      )}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h3 className="font-semibold mb-2">Contact Information</h3>
-                    <ul className="space-y-2">
-                      {selectedHotel.email && <li>Email: {selectedHotel.email}</li>}
-                      {selectedHotel.website && (
-                        <li>
-                          Website:{' '}
-                          <a href={selectedHotel.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                            Visit Website
-                          </a>
-                        </li>
-                      )}
-                      {selectedHotel.phoneResponses?.map((phone, index) => (
-                        <li key={index}>
-                          {phone.phoneType}: {phone.phoneNumber}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
+                {/* Facilities */}
                 {selectedHotel.facilityResponses?.length > 0 && (
                   <div>
                     <h3 className="font-semibold mb-2">Facilities</h3>
@@ -329,21 +314,82 @@ export function HotelList({ searchParams }: HotelListProps) {
                   </div>
                 )}
 
+                <div className='grid grid-cols-2 gap-4 justify-between items-start'>
+                  {/* Contact Info */}
+                  <div>
+                    <h3 className="font-semibold mb-2">Contact Information</h3>
+                    <ul className="space-y-2">
+                      {selectedHotel.email && <li>Email: {selectedHotel.email}</li>}
+                      {selectedHotel.website && (
+                        <li>
+                          Website:{' '}
+                          <a href={selectedHotel.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                            Visit Website
+                          </a>
+                        </li>
+                      )}
+                      {selectedHotel.phoneResponses?.length > 0 && selectedHotel.phoneResponses.map((phone, index) => (
+                        <li key={index}>
+                          {phone.phoneType}: {phone.phoneNumber}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Points of Interest */}
+                  {selectedHotel.interestPoints?.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-2">Points of Interest Nearby</h3>
+                      <ul className="list-disc ml-4">
+                        {selectedHotel.interestPoints.map((point, i) => (
+                          <li key={i}>{point.pointName} ({point.distance})</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                {/* Room Types & Rates */}
                 {selectedHotel.roomResponses?.length > 0 && (
                   <div>
                     <h3 className="font-semibold mb-2">Available Rooms</h3>
-                    <div className="space-y-4">
-                      {selectedHotel.roomResponses.map((room, index) => (
-                        <div key={index} className="border rounded-lg p-4">
-                          <h4 className="font-medium">{room.roomName}</h4>
+                    <div className="gap-4 grid grid-cols-12">
+                      {selectedHotel.roomResponses?.map?.((room, index) => (
+                        <div key={index} className="border rounded-lg p-4 col-span-6 w-full">
+                          <h4 className="font-medium mb-1">{room.roomName}</h4>
                           {room.boardNameResponse?.length > 0 && (
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p className="text-sm text-muted-foreground mb-1">
                               Board Options: {room.boardNameResponse.map(board => board.boardName).join(', ')}
                             </p>
                           )}
-                          <p className="text-lg font-semibold mt-2">
-                            ₹{room.rateKeyResponses.totalPrice.toLocaleString()}
+                          <p className="text-lg font-semibold mb-1">
+                            ₹{room.rateKeyResponses?.totalPrice?.toLocaleString?.() || 'N/A'}
                           </p>
+                          {/* Cancellation Policies */}
+                          {room.rateKeyResponses?.rateKeys?.[0]?.cancellationPolicy?.length > 0 && (
+                            <div className="text-xs text-gray-500 mb-1">
+                              <span className="font-semibold">Cancellation Policy:</span>
+                              <ul className="list-disc ml-4">
+                                {room.rateKeyResponses.rateKeys[0].cancellationPolicy.map((policy, i) => (
+                                  <li key={i}>
+                                    {policy.amount === '0' ? 'Free cancellation' : `${policy.amount}% charge`} from {policy.from?.split('T')[0]}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {/* Promotions */}
+                          {room?.rateKeyResponses?.rateKeys?.[0]?.promotionResponses &&
+                            room.rateKeyResponses.rateKeys[0].promotionResponses.length > 0 && (
+                            <div className="text-xs text-green-700 dark:text-green-400 mb-1">
+                              <span className="font-semibold">Promotions:</span>
+                              <ul className="list-disc ml-4">
+                                {room.rateKeyResponses.rateKeys[0].promotionResponses.map((promo, i) => (
+                                  <li key={i}>{promo.name} - {promo.remark}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

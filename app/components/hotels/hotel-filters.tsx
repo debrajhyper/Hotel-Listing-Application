@@ -446,13 +446,14 @@ export function HotelFilters({ onFilterChange, initialFilters }: HotelFiltersPro
           </div>
           <div className="space-y-2 mt-2">
             {[5, 4, 3, 2, 1].map((stars) => (
-              <div key={stars} className="flex items-center space-x-2">
+              <div key={stars} className="flex items-center space-x-2 cursor-pointer">
                 <Checkbox
                   id={`stars-${stars}`}
+                  className="cursor-pointer"
                   checked={isStarRatingSelected(stars)}
                   onCheckedChange={(checked: boolean | string) => handleStarCategoryChange(stars, checked)}
                 />
-                <Label htmlFor={`stars-${stars}`} className="flex items-center space-x-1">
+                <Label htmlFor={`stars-${stars}`} className="flex items-center space-x-1 cursor-pointer">
                   {Array(stars).fill(null).map((_, i) => (
                     <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7.2-6.3-4.8-6.3 4.8 2.3-7.2-6-4.6h7.6z" />

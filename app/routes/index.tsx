@@ -4,8 +4,8 @@ import { HotelSearchForm } from '../components/hotels/hotel-search-form';
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Hotel Listing Application | Debraj Karmakar" },
+    { name: "description", content: "This application allows users to search and browse hotel properties based on destination, travel dates, and occupancy preferences. The result page presents a searchable and filterable list of hotels, and users can view detailed information about each property, including images, descriptions, facilities, room rates, and contact information. All data is fetched via predefined APIs, with support for dynamic filtering and sorting options." },
   ];
 }
 
