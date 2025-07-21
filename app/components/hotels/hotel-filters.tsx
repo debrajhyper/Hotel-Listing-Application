@@ -51,8 +51,6 @@ export function HotelFilters({ onFilterChange, initialFilters }: HotelFiltersPro
   // Calculate min/max prices from actual hotel data
   const [availableMinPrice, availableMaxPrice] = getMinMaxPrices(hotels);
 
-  console.log('Available prices:', availableMinPrice, availableMaxPrice);
-
   // Use ref to track if price range has been initialized
   const priceRangeInitializedRef = useRef(false);
 

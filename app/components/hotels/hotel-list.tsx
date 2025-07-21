@@ -10,7 +10,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import type { Hotel, HotelSearchRequest } from '../../types/hotel';
 import { RotateCcw } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { HotelService, dummyHotels } from '../../services/hotel-service';
+import { HotelService } from '../../services/hotel-service';
 
 const DEFAULT_IMAGE = 'https://placehold.co/600x400?text=No+Image';
 
@@ -60,7 +60,8 @@ export function HotelList({ searchParams }: HotelListProps) {
   }, [dispatch, hotels, filters.sortBy, filters.propertyName]);
 
   // Use filteredHotels for display
-  const displayHotels = dummyHotels;
+  const displayHotels = filteredHotels.length > 0 ? filteredHotels : hotels;
+  // const displayHotels = dummyHotels;
 
   if (error) {
     return (
